@@ -6,7 +6,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/pablosukaban/go-pokedex/api"
+	"github.com/pablosukaban/go-pokedex/pokeapi"
 )
 
 func getCommands() map[string]cliCommand {
@@ -36,7 +36,7 @@ func getCommands() map[string]cliCommand {
 
 type config struct {
 	commands   map[string]cliCommand
-	pokeAPI    api.Client
+	pokeAPI    pokeapi.Client
 	mapURLNext string
 	mapURLPrev string
 }
