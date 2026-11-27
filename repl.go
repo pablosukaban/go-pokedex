@@ -5,11 +5,12 @@ import (
 	"fmt"
 	"os"
 	"strings"
+
+	"github.com/pablosukaban/go-pokedex/api"
 )
 
 func getCommands() map[string]cliCommand {
 	return map[string]cliCommand{
-
 		"exit": {
 			name:        "exit",
 			description: "Exit the Pokedex",
@@ -20,13 +21,30 @@ func getCommands() map[string]cliCommand {
 			description: "Displays a help message",
 			callback:    commandHelp,
 		},
+		"map": {
+			name:        "map",
+			description: "Get the next page of locations",
+			callback:    commandMap,
+		},
+		"mapb": {
+			name:        "mapb",
+			description: "Get the previous page of locations",
+			callback:    commandMapb,
+		},
 	}
+}
+
+type config struct {
+	commands   map[string]cliCommand
+	pokeAPI    api.Client
+	mapURLNext string
+	mapURLPrev string
 }
 
 type cliCommand struct {
 	name        string
 	description string
-	callback    func() error
+	callback    func(*config) error
 }
 
 func cleanInput(text string) []string {
@@ -36,8 +54,7 @@ func cleanInput(text string) []string {
 	return res
 }
 
-func startRepl() {
-
+func startRepl(cfg *config) {
 	scanner := bufio.NewScanner(os.Stdin)
 
 	for {
@@ -57,12 +74,12 @@ func startRepl() {
 			continue
 		}
 		first := cleaned[0]
-		command, ok := getCommands()[first]
+		command, ok := cfg.commands[first]
 		if !ok {
 			fmt.Println("Unknown command")
 			continue
 		}
-		if err := command.callback(); err != nil {
+		if err := command.callback(cfg); err != nil {
 			fmt.Println(err)
 			continue
 		}
